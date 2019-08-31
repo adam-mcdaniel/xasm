@@ -11,7 +11,7 @@ Xasm is meant to be an intermediate representation for compiled and dynamically 
 - Simple syntax
 
 ## Documentation
-You can find the virtual machine's documentation (here)[https://docs.rs/xmachine], and the compiler backend documentation (here)[https://docs.rs/xassembler]. Both of these components are called `xmachine` and `xassembler` respectively, and you can find them on my GitHub account.
+You can find the virtual machine's documentation [here](https://docs.rs/xmachine), and the compiler backend documentation [here](https://docs.rs/xassembler). Both of these components are called `xmachine` and `xassembler` respectively, and you can find them on my GitHub account.
 
 ```bash
 $ xasm
@@ -133,7 +133,7 @@ cargo install -f xasm
 
 ## Issues
 
-If you run into a problem, (post an issue)[https://github.com/adam-mcdaniel/xasm/issues/new]!
+If you run into a problem, [post an issue](https://github.com/adam-mcdaniel/xasm/issues/new)!
 
 ## License
 
