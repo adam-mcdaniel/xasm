@@ -1,7 +1,7 @@
 
 
 fn print(object) {
-    if (object.to_str) {
+    if object.to_str {
         println(object.to_str())
     } else {
         println(object)
