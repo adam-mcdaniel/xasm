@@ -8,6 +8,7 @@ description = "Compiler for the xasm programming language"
 homepage = "https://github.com/adam-mcdaniel/xasm"
 repository = "https://github.com/adam-mcdaniel/xasm"
 documentation = "https://github.com/adam-mcdaniel/xasm"
+readme = "README.md"
 
 [[bin]]
 name = "xasm"
