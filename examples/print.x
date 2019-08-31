@@ -10,6 +10,8 @@ fn print(object) {
 
 print("string")
 
+
+
 class Test {
     fn new(self) {
         self
