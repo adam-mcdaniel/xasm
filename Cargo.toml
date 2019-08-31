@@ -3,12 +3,15 @@ name = "xasm"
 version = "0.1.0"
 authors = ["adam-mcdaniel <adam.mcdanie17@gmail.com>"]
 edition = "2018"
+license = "Apache-2.0"
+description = "Compiler for the xasm programming language"
+homepage = "https://github.com/adam-mcdaniel/xasm"
+repository = "https://github.com/adam-mcdaniel/xasm"
+documentation = "https://github.com/adam-mcdaniel/xasm"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [[bin]]
 name = "xasm"
 path = "src/bin.rs"
-
 
 [dependencies]
 xassembler = "0.1.0"
