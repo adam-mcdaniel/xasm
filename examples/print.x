@@ -1,9 +1,12 @@
 
-
+// Define print function
 fn print(object) {
+    // If `object` has a `to_str` attribute
     if object.to_str {
+        // print the result of that method
         println(object.to_str())
     } else {
+        // print the raw object
         println(object)
     }
 }
@@ -21,6 +24,5 @@ class Test {
         "TESTING!!!"
     }
 }
-
 
 print(new(Test))

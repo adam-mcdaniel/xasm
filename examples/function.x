@@ -25,7 +25,6 @@ fn If(c) {
     }
 }
 
-
 println(
     ((If(True))(1))(2)
 )

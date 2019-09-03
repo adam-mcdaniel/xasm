@@ -19,6 +19,10 @@ class List {
     fn len(self) {
         len(self.list)
     }
+
+    fn index(self, n) {
+        (self.list)[n]
+    }
 }
 
 
@@ -30,4 +34,9 @@ while n {
     n = sub(n, 1)
 }
 
-println(l)
+
+n = 100
+while sub(n, 0) {
+    println(l.index(sub(100, n)))
+    n = sub(n, 1)
+}

@@ -1,5 +1,5 @@
 
-
+// Represents a point on a plane
 class Point {
     fn new(self, x, y) {
         self.goto(x, y)
@@ -21,4 +21,7 @@ class Point {
 
 
 sp = new(Point, 3, 5)
+println(sp)
+
+sp.move(-1, -3)
 println(sp)
