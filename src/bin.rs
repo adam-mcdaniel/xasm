@@ -34,6 +34,7 @@ fn main() -> Result<(), String> {
     )
     .setting(ArgRequiredElseHelp)
     .get_matches();
+    
 
     if let Some(matches) = matches.subcommand_matches("run") {
         let input = matches.value_of("INPUT").unwrap();

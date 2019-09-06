@@ -10,7 +10,7 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-xmachine = "0.1.2"
+xmachine = "0.1.11"
 "#;
 
 pub const BIN_PRELUDE: &str = r#"
@@ -133,6 +133,15 @@ fn div(xasm: &mut Machine) {
     }
 }
 
+fn rem(xasm: &mut Machine) {
+    let m = xasm.get_arg::<f64>();
+    let n = xasm.get_arg::<f64>();
+
+    xasm.push(
+        Value::number(m % n)
+    );
+}
+
 fn main() {
     let mut xasm = Machine::new();
     xasm.push(Value::function(dict, &xasm));
@@ -185,6 +194,10 @@ fn main() {
     xasm.push(Value::function(div, &xasm));
     xasm.copy();
     xasm.push(Value::string("div"));
+    xasm.store();
+    xasm.push(Value::function(rem, &xasm));
+    xasm.copy();
+    xasm.push(Value::string("rem"));
     xasm.store();
 "#;
 
