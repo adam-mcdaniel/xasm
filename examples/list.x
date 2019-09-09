@@ -28,15 +28,10 @@ class List {
 
 l = new(List)
 
-n = 1000
+n = 10
 while n {
     l.push(n)
     n = sub(n, 1)
 }
 
-
-n = 100
-while sub(n, 0) {
-    println(l.index(sub(100, n)))
-    n = sub(n, 1)
-}
+println(l)

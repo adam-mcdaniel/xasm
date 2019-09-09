@@ -26,5 +26,9 @@ fn If(c) {
 }
 
 println(
-    ((If(True))(1))(2)
+    ((If(False))(1))(2)
 )
+
+
+println(double(5))
+println(triple(5))

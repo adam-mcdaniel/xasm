@@ -9,5 +9,5 @@ class Object {
 
 
 
-obj = new(Object, 5)
+obj = (Object()).new(5)
 println(obj.value)

@@ -1,4 +1,8 @@
+use std::fs::{rename, write};
+use std::process::{Command, Stdio};
+use xassembler::Rust;
 
+use crate::compile::Compile;
 
 pub const MANIFEST: &str = r#"
 [package]
@@ -13,7 +17,55 @@ edition = "2018"
 xmachine = "0.1.11"
 "#;
 
-pub const BIN_PRELUDE: &str = r#"
+impl Compile for Rust {
+    fn compile_subcommand(compiled: &str, output_path: &str) -> Result<(), String> {
+        Self::build(compiled)?;
+
+        rename(Self::build_dir()? + "/target/release/target", output_path).unwrap();
+
+        Ok(())
+    }
+
+    fn run_subcommand(compiled: &str) -> Result<(), String> {
+        Self::build(compiled)?;
+
+        Command::new("cargo")
+            .args(&["run", "--release"])
+            .current_dir(Self::build_dir()?)
+            .stdout(Stdio::inherit())
+            .output()
+            .unwrap();
+
+        Ok(())
+    }
+
+    fn build(compiled: &str) -> Result<(), String> {
+        match Command::new("cargo")
+            .current_dir(Self::home_dir()?)
+            .args(&["new", Self::BUILD_DIR_NAME])
+            .output()
+        {
+            _ => (),
+        };
+
+        write(Self::build_dir()? + "/src/main.rs", compiled)
+            .expect("Could not write to file target/src/main.rs");
+
+        write(Self::build_dir()? + "/Cargo.toml", MANIFEST)
+            .expect("Could not write to target/Cargo.toml");
+
+        Command::new("cargo")
+            .args(&["build", "--release"])
+            .current_dir(Self::build_dir()?)
+            .output()
+            .unwrap();
+
+        Ok(())
+    }
+
+    const TERMINATE: &'static str = "\n}";
+    const BUILD_DIR_NAME: &'static str = "xasm_build";
+    const PRELUDE: &'static str = r#"
 extern crate xmachine;
 use xmachine::{Machine, Value, Ref};
 
@@ -200,4 +252,4 @@ fn main() {
     xasm.push(Value::string("rem"));
     xasm.store();
 "#;
-
+}
