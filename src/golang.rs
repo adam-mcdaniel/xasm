@@ -8,7 +8,15 @@ impl Compile for Golang {
     fn compile_subcommand(compiled: &str, output_path: &str) -> Result<(), String> {
         Self::build(compiled)?;
 
-        rename(Self::build_dir()? + "/main", output_path).unwrap();
+        match rename(Self::build_dir()? + "/main", output_path) {
+            _ => {}
+        };
+        match rename(Self::build_dir()? + "/main.exe", output_path) {
+            _ => {}
+        };
+        match rename(Self::build_dir()? + "/main.bin", output_path) {
+            _ => {}
+        };
 
         Ok(())
     }
@@ -62,30 +70,44 @@ func list(m *Machine) {
 }
 
 func push(m *Machine) {
-	list := m.Pop().Slice()
-	item := m.Pop()
-
-	m.Push(NewList(append(list, item)))
+	if list, err := m.Pop(); err == nil {
+		if item, err := m.Pop(); err == nil {
+			m.Push(NewList(append(list.Slice(), item)))
+		}
+	}
 }
 
 func pop(m *Machine) {
-	list := m.Pop().Slice()
+	if value, err := m.Pop(); err == nil {
+		list := value.Slice()
 
-	item, list := list[len(list)-1], list[:len(list)-1]
-	m.Push(item)
-	m.Push(NewList(list))
+		item, list := list[len(list)-1], list[:len(list)-1]
+		m.Push(item)
+		m.Push(NewList(list))
+	}
 }
 
 func length(m *Machine) {
-	m.Push(NewNumber(float64(len(m.Pop().Slice()))))
+	if value, err := m.Pop(); err == nil {
+		list := value.Slice()
+		m.Push(NewNumber(float64(len(list))))
+	}
 }
 
 func print(m *Machine) {
-	fmt.Print(*m.Pop())
+	if a, err := m.Pop(); err == nil {
+		fmt.Print(*a)
+	}
 }
 
 func println(m *Machine) {
-	fmt.Println(*m.Pop())
+	if a, err := m.Pop(); err == nil {
+		fmt.Println(*a)
+	}
+}
+
+func debug(m *Machine) {
+	fmt.Println(*m)
 }
 
 func new(m *Machine) {
@@ -95,80 +117,88 @@ func new(m *Machine) {
 }
 
 func add(m *Machine) {
-	a := m.Pop()
-	b := m.Pop()
-
-	m.Push(NewNumber(a.Number() + b.Number()))
+	if a, err := m.Pop(); err == nil {
+		if b, err := m.Pop(); err == nil {
+			m.Push(NewNumber(a.Number() + b.Number()))
+		}
+	}
 }
 
 func sub(m *Machine) {
-	a := m.Pop()
-	b := m.Pop()
-
-	m.Push(NewNumber(a.Number() - b.Number()))
+	if a, err := m.Pop(); err == nil {
+		if b, err := m.Pop(); err == nil {
+			m.Push(NewNumber(a.Number() - b.Number()))
+		}
+	}
 }
 
 func mul(m *Machine) {
-	a := m.Pop()
-	b := m.Pop()
-
-	m.Push(NewNumber(a.Number() * b.Number()))
+	if a, err := m.Pop(); err == nil {
+		if b, err := m.Pop(); err == nil {
+			m.Push(NewNumber(a.Number() * b.Number()))
+		}
+	}
 }
 
 func div(m *Machine) {
-	a := m.Pop()
-	b := m.Pop()
-
-	m.Push(NewNumber(a.Number() / b.Number()))
+	if a, err := m.Pop(); err == nil {
+		if b, err := m.Pop(); err == nil {
+			m.Push(NewNumber(a.Number() / b.Number()))
+		}
+	}
 }
 
 func rem(m *Machine) {
-	a := m.Pop()
-	b := m.Pop()
-
-	m.Push(NewNumber(math.Mod(a.Number(), b.Number())))
+	if a, err := m.Pop(); err == nil {
+		if b, err := m.Pop(); err == nil {
+			m.Push(NewNumber(math.Mod(a.Number(), b.Number())))
+		}
+	}
 }
 
 func main() {
 	xasm := MakeMachine()
-	xasm.Push(NewFunction(dict, xasm))
+	xasm.Push(NewFunction(dict, xasm.Duplicate()))
 	xasm.Push(NewString("dict"))
 	xasm.Store()
-	xasm.Push(NewFunction(list, xasm))
+	xasm.Push(NewFunction(list, xasm.Duplicate()))
 	xasm.Push(NewString("list"))
 	xasm.Store()
-	xasm.Push(NewFunction(length, xasm))
+	xasm.Push(NewFunction(length, xasm.Duplicate()))
 	xasm.Push(NewString("len"))
 	xasm.Store()
-	xasm.Push(NewFunction(push, xasm))
+	xasm.Push(NewFunction(push, xasm.Duplicate()))
 	xasm.Push(NewString("push"))
 	xasm.Store()
-	xasm.Push(NewFunction(pop, xasm))
+	xasm.Push(NewFunction(pop, xasm.Duplicate()))
 	xasm.Push(NewString("pop"))
 	xasm.Store()
-	xasm.Push(NewFunction(print, xasm))
+	xasm.Push(NewFunction(print, xasm.Duplicate()))
 	xasm.Push(NewString("print"))
 	xasm.Store()
-	xasm.Push(NewFunction(println, xasm))
+	xasm.Push(NewFunction(println, xasm.Duplicate()))
 	xasm.Push(NewString("println"))
 	xasm.Store()
-	xasm.Push(NewFunction(new, xasm))
+	xasm.Push(NewFunction(new, xasm.Duplicate()))
 	xasm.Push(NewString("new"))
 	xasm.Store()
-	xasm.Push(NewFunction(add, xasm))
+	xasm.Push(NewFunction(add, xasm.Duplicate()))
 	xasm.Push(NewString("add"))
 	xasm.Store()
-	xasm.Push(NewFunction(sub, xasm))
+	xasm.Push(NewFunction(sub, xasm.Duplicate()))
 	xasm.Push(NewString("sub"))
 	xasm.Store()
-	xasm.Push(NewFunction(mul, xasm))
+	xasm.Push(NewFunction(mul, xasm.Duplicate()))
 	xasm.Push(NewString("mul"))
 	xasm.Store()
-	xasm.Push(NewFunction(div, xasm))
+	xasm.Push(NewFunction(div, xasm.Duplicate()))
 	xasm.Push(NewString("div"))
 	xasm.Store()
-	xasm.Push(NewFunction(rem, xasm))
+	xasm.Push(NewFunction(rem, xasm.Duplicate()))
 	xasm.Push(NewString("rem"))
+	xasm.Store()
+	xasm.Push(NewFunction(debug, xasm.Duplicate()))
+	xasm.Push(NewString("debug"))
 	xasm.Store()
     
 "#;

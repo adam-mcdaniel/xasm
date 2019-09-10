@@ -14,14 +14,28 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-xmachine = "0.1.11"
+xmachine = "0.1.15"
 "#;
 
 impl Compile for Rust {
     fn compile_subcommand(compiled: &str, output_path: &str) -> Result<(), String> {
         Self::build(compiled)?;
 
-        rename(Self::build_dir()? + "/target/release/target", output_path).unwrap();
+        match rename(Self::build_dir()? + "/target/release/target", output_path) {
+            _ => {}
+        };
+        match rename(
+            Self::build_dir()? + "/target/release/target.exe",
+            output_path,
+        ) {
+            _ => {}
+        };
+        match rename(
+            Self::build_dir()? + "/target/release/target.bin",
+            output_path,
+        ) {
+            _ => {}
+        };
 
         Ok(())
     }
@@ -118,6 +132,10 @@ fn println(xasm: &mut Machine) {
     if let Some(string) = xasm.pop() {
         println!("{}", string);
     }
+}
+
+fn debug(xasm: &mut Machine) {
+    println!("{}", xasm);
 }
 
 fn new(xasm: &mut Machine) {
@@ -250,6 +268,10 @@ fn main() {
     xasm.push(Value::function(rem, &xasm));
     xasm.copy();
     xasm.push(Value::string("rem"));
+    xasm.store();
+    xasm.push(Value::function(debug, &xasm));
+    xasm.copy();
+    xasm.push(Value::string("debug"));
     xasm.store();
 "#;
 }

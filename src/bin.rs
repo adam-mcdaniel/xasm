@@ -1,7 +1,7 @@
 use clap::{clap_app, crate_version, AppSettings::ArgRequiredElseHelp, ArgMatches};
-use xassembler::{Golang, Rust};
 use std::fs::read_to_string;
 use xasm::compile::Compile;
+use xassembler::{Golang, Rust};
 
 fn main() -> Result<(), String> {
     let matches = clap_app!(xasm =>
@@ -39,7 +39,6 @@ fn main() -> Result<(), String> {
 
     Ok(())
 }
-
 
 fn cli<T: Compile>(matches: ArgMatches) -> Result<(), String> {
     if let Some(matches) = matches.subcommand_matches("run") {

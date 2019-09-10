@@ -20,10 +20,10 @@ pub trait Compile: Target {
     }
 
     fn home_dir() -> Result<String, String> {
-        let home = dirs::home_dir().ok_or(String::from("No home directory in this environment"))?;
+        let home = dirs::home_dir().ok_or_else(|| String::from("No home directory in this environment"))?;
         Ok(home
             .to_str()
-            .ok_or(String::from("No home directory in this environment"))?
+            .ok_or_else(|| String::from("No home directory in this environment"))?
             .to_string())
     }
 
