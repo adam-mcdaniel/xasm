@@ -39,7 +39,7 @@ class Option {
 }
 
 fn Some(val) {
-    (((((Option()))))).some(val)
+    (Option()).some(val)
 }
 
 fn None() {
