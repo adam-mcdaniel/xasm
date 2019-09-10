@@ -23,10 +23,10 @@ class Option {
 
     fn and_then(self, lambda) {
         if self.is_something {
-            self.object = lambda(self.object)
-
-            if self.object {}
-            else { self.is_something = false }
+            result = lambda(self.object)
+            if result {
+                self.object = result
+            } else { self.is_something = false }
         } else {}
 
         self
@@ -49,16 +49,29 @@ fn None() {
 
 
 
-five = Some(0)
 
-
-five = five.and_then(
-    fn(a) {
-        if a { div(2, a) }
+divide = fn(b) { fn(a) { div(a, b) } }
+multiply = fn(b) { fn(a) { mul(a, b) } }
+power = fn(base) {
+    fn(power) {
+        total = 1
+        while power {
+            total = mul(total, base)
+            power = sub(power, 1)
+        }
+        total
     }
-)
+}
 
+square = fn(n) { (power(n))(2) }
 
-println(
-    five.or_else("bad calculation")
-)
+n = Some(1.000000000000001)
+
+counter = 59
+while counter {
+    counter = sub(counter, 1)
+    n = n.and_then(square)
+    println(
+        n.or_else("bad calculation")
+    )
+}
