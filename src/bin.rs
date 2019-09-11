@@ -33,8 +33,6 @@ fn main() -> Result<(), String> {
         cli::<Golang>(matches)?
     } else if matches.is_present("rust") {
         cli::<Rust>(matches)?
-    } else {
-        println!("no target!");
     }
 
     Ok(())
@@ -49,6 +47,8 @@ fn cli<T: Compile>(matches: ArgMatches) -> Result<(), String> {
                 Ok(compiled) => T::run_subcommand(&compiled)?,
                 Err(e) => println!("{}", e),
             }
+        } else {
+            eprintln!("Could not open file {}", input);
         }
     }
 
@@ -61,6 +61,8 @@ fn cli<T: Compile>(matches: ArgMatches) -> Result<(), String> {
                 Ok(compiled) => T::compile_subcommand(&compiled, &output)?,
                 Err(e) => println!("{}", e),
             }
+        } else {
+            eprintln!("Could not open file {}", input);
         }
     }
 
