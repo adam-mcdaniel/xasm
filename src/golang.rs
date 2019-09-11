@@ -57,7 +57,6 @@ impl Compile for Golang {
 
 import (
 	"fmt"
-	"math"
 	. "github.com/adam-mcdaniel/xgopher"
 )
 
@@ -70,40 +69,36 @@ func list(m *Machine) {
 }
 
 func push(m *Machine) {
-	if list, err := m.Pop(); err == nil {
-		if item, err := m.Pop(); err == nil {
-			m.Push(NewList(append(list.Slice(), item)))
-		}
-	}
+	list := m.Pop()
+	item := m.Pop()
+	m.Push(NewList(append(list.Slice(), item)))
 }
 
 func pop(m *Machine) {
-	if value, err := m.Pop(); err == nil {
-		list := value.Slice()
-
-		item, list := list[len(list)-1], list[:len(list)-1]
+	value := m.Pop()
+	list := value.Slice()
+	if len(list) > 0 {
+		item := list[len(list)-1]
+		list = list[:len(list)-1]
 		m.Push(item)
-		m.Push(NewList(list))
+	} else {
+		m.Push(NewNone())
 	}
+	m.Push(NewList(list))
 }
 
 func length(m *Machine) {
-	if value, err := m.Pop(); err == nil {
-		list := value.Slice()
-		m.Push(NewNumber(float64(len(list))))
-	}
+	value := m.Pop()
+	list := value.Slice()
+	m.Push(NewNumber(float64(len(list))))
 }
 
 func print(m *Machine) {
-	if a, err := m.Pop(); err == nil {
-		fmt.Print(*a)
-	}
+	fmt.Print(*m.Pop())
 }
 
 func println(m *Machine) {
-	if a, err := m.Pop(); err == nil {
-		fmt.Println(*a)
-	}
+	fmt.Println(*m.Pop())
 }
 
 func debug(m *Machine) {
@@ -117,43 +112,45 @@ func new(m *Machine) {
 }
 
 func add(m *Machine) {
-	if a, err := m.Pop(); err == nil {
-		if b, err := m.Pop(); err == nil {
-			m.Push(NewNumber(a.Number() + b.Number()))
-		}
-	}
+	a := m.Pop()
+	b := m.Pop()
+	m.Push(a.Add(b))
 }
 
 func sub(m *Machine) {
-	if a, err := m.Pop(); err == nil {
-		if b, err := m.Pop(); err == nil {
-			m.Push(NewNumber(a.Number() - b.Number()))
-		}
-	}
+	a := m.Pop()
+	b := m.Pop()
+	m.Push(a.Sub(b))
 }
 
 func mul(m *Machine) {
-	if a, err := m.Pop(); err == nil {
-		if b, err := m.Pop(); err == nil {
-			m.Push(NewNumber(a.Number() * b.Number()))
-		}
-	}
+	a := m.Pop()
+	b := m.Pop()
+	m.Push(a.Mul(b))
 }
 
 func div(m *Machine) {
-	if a, err := m.Pop(); err == nil {
-		if b, err := m.Pop(); err == nil {
-			m.Push(NewNumber(a.Number() / b.Number()))
-		}
-	}
+	a := m.Pop()
+	b := m.Pop()
+	m.Push(a.Div(b))
 }
 
 func rem(m *Machine) {
-	if a, err := m.Pop(); err == nil {
-		if b, err := m.Pop(); err == nil {
-			m.Push(NewNumber(math.Mod(a.Number(), b.Number())))
-		}
-	}
+	a := m.Pop()
+	b := m.Pop()
+	m.Push(a.Rem(b))
+}
+
+func not(m *Machine) {
+	m.Push(m.Pop().Not())
+}
+
+func eq(m *Machine) {
+	m.Push(m.Pop().Eq(m.Pop()))
+}
+
+func is_error(m *Machine) {
+	m.Push(NewBool(m.Pop().Type() == ErrorType))
 }
 
 func main() {
@@ -197,8 +194,14 @@ func main() {
 	xasm.Push(NewFunction(rem, xasm.Duplicate()))
 	xasm.Push(NewString("rem"))
 	xasm.Store()
+	xasm.Push(NewFunction(not, xasm.Duplicate()))
+	xasm.Push(NewString("not"))
+	xasm.Store()
 	xasm.Push(NewFunction(debug, xasm.Duplicate()))
 	xasm.Push(NewString("debug"))
+	xasm.Store()
+	xasm.Push(NewFunction(eq, xasm.Duplicate()))
+	xasm.Push(NewString("eq"))
 	xasm.Store()
     
 "#;

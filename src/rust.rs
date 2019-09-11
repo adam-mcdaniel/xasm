@@ -14,7 +14,7 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-xmachine = "0.1.15"
+xmachine = "0.1.17"
 "#;
 
 impl Compile for Rust {
@@ -81,7 +81,7 @@ impl Compile for Rust {
     const BUILD_DIR_NAME: &'static str = "xasm_build";
     const PRELUDE: &'static str = r#"
 extern crate xmachine;
-use xmachine::{Machine, Value, Ref};
+use xmachine::{Machine, Value};
 
 
 fn dict(xasm: &mut Machine) {
@@ -93,45 +93,36 @@ fn list(xasm: &mut Machine) {
 }
 
 fn push(xasm: &mut Machine) {
-    if let Some(list_value) = xasm.pop() {
-        if let Value::List(mut l) = (*list_value).clone() {
-            if let Some(value) = xasm.pop() {
-                l.push(value);
-                xasm.push(Ref::new(Value::List(l)));
-            }
-        }
+    let list_value = xasm.pop();
+    if let Value::List(mut l) = (*list_value).clone() {
+        l.push(xasm.pop());
+        xasm.return_value(Value::List(l));
     }
 }
 
 fn pop(xasm: &mut Machine) {
-    if let Some(value) = xasm.pop() {
-        if let Value::List(mut l) = (*value).clone() {
-            let last_value = l[l.len() - 1].clone();
-            l.pop();
-            xasm.push(last_value.copy());
-            xasm.push(Ref::new(Value::List(l)));
-        }
+    let value = xasm.pop();
+    if let Value::List(mut l) = (*value).clone() {
+        let last_value = l[l.len() - 1].clone();
+        l.pop();
+        xasm.push(last_value.copy());
+        xasm.return_value(Value::List(l));
     }
 }
 
 fn len(xasm: &mut Machine) {
-    if let Some(value) = xasm.pop() {
-        if let Value::List(l) = (*value).clone() {
-            xasm.push(Value::number(l.len() as f64));
-        }
+    let value = xasm.pop();
+    if let Value::List(l) = (*value).clone() {
+        xasm.push(Value::number(l.len() as f64));
     }
 }
 
 fn print(xasm: &mut Machine) {
-    if let Some(string) = xasm.pop() {
-        print!("{}", string);
-    }
+    print!("{}", xasm.pop());
 }
 
 fn println(xasm: &mut Machine) {
-    if let Some(string) = xasm.pop() {
-        println!("{}", string);
-    }
+    println!("{}", xasm.pop());
 }
 
 fn debug(xasm: &mut Machine) {
@@ -139,77 +130,58 @@ fn debug(xasm: &mut Machine) {
 }
 
 fn new(xasm: &mut Machine) {
-    if let Some(class) = xasm.pop() {
-        class.call(xasm);
-        xasm.push(Value::string("new"));
-        xasm.method_call();
-    }
+    let class = xasm.pop();
+    class.call(xasm);
+    xasm.push(Value::string("new"));
+    xasm.method_call();
 }
 
-
 fn add(xasm: &mut Machine) {
-    let first = xasm.pop();
-    let second = xasm.pop();
-
-    if let (Some(m), Some(n)) = (first, second) {
-        let m_f = m.to_string().parse::<f64>().unwrap();
-        let n_f = n.to_string().parse::<f64>().unwrap();
-
-        xasm.push(
-            Value::number(m_f + n_f)
-        );
-    }
+    let first = xasm.get_arg();
+    let second = xasm.get_arg();
+    xasm.return_value(first + second);
 }
 
 fn sub(xasm: &mut Machine) {
-    let first = xasm.pop();
-    let second = xasm.pop();
-
-    if let (Some(m), Some(n)) = (first, second) {
-        let m_f = m.to_string().parse::<f64>().unwrap();
-        let n_f = n.to_string().parse::<f64>().unwrap();
-
-        xasm.push(
-            Value::number(m_f - n_f)
-        );
-    }
+    let first = xasm.get_arg();
+    let second = xasm.get_arg();
+    xasm.return_value(first - second);
 }
 
 fn mul(xasm: &mut Machine) {
-    let first = xasm.pop();
-    let second = xasm.pop();
-
-    if let (Some(m), Some(n)) = (first, second) {
-        let m_f = m.to_string().parse::<f64>().unwrap();
-        let n_f = n.to_string().parse::<f64>().unwrap();
-
-        xasm.push(
-            Value::number(m_f * n_f)
-        );
-    }
+    let first = xasm.get_arg();
+    let second = xasm.get_arg();
+    xasm.return_value(first * second);
 }
 
 fn div(xasm: &mut Machine) {
-    let first = xasm.pop();
-    let second = xasm.pop();
-
-    if let (Some(m), Some(n)) = (first, second) {
-        let m_f = m.to_string().parse::<f64>().unwrap();
-        let n_f = n.to_string().parse::<f64>().unwrap();
-
-        xasm.push(
-            Value::number(m_f / n_f)
-        );
-    }
+    let first = xasm.get_arg();
+    let second = xasm.get_arg();
+    xasm.return_value(first / second);
 }
 
 fn rem(xasm: &mut Machine) {
-    let m = xasm.get_arg::<f64>();
-    let n = xasm.get_arg::<f64>();
+    let first = xasm.get_arg();
+    let second = xasm.get_arg();
+    xasm.return_value(first % second);
+}
 
-    xasm.push(
-        Value::number(m % n)
-    );
+fn not(xasm: &mut Machine) {
+    let value = xasm.get_arg();
+    xasm.return_value(!value);
+}
+
+fn eq(xasm: &mut Machine) {
+    let first = xasm.get_arg();
+    let second = xasm.get_arg();
+    xasm.return_value(Value::from(first == second));
+}
+
+fn is_error(xasm: &mut Machine) {
+    match xasm.get_arg() {
+        Value::Error(_) => xasm.return_value(Value::from(true)),
+        _ => xasm.return_value(Value::from(false))
+    }
 }
 
 fn main() {
@@ -269,9 +241,21 @@ fn main() {
     xasm.copy();
     xasm.push(Value::string("rem"));
     xasm.store();
+    xasm.push(Value::function(not, &xasm));
+    xasm.copy();
+    xasm.push(Value::string("not"));
+    xasm.store();
     xasm.push(Value::function(debug, &xasm));
     xasm.copy();
     xasm.push(Value::string("debug"));
+    xasm.store();
+    xasm.push(Value::function(eq, &xasm));
+    xasm.copy();
+    xasm.push(Value::string("eq"));
+    xasm.store();
+    xasm.push(Value::function(is_error, &xasm));
+    xasm.copy();
+    xasm.push(Value::string("is_error"));
     xasm.store();
 "#;
 }
