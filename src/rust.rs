@@ -112,9 +112,15 @@ fn pop(xasm: &mut Machine) {
 
 fn len(xasm: &mut Machine) {
     let value = xasm.pop();
-    if let Value::List(l) = (*value).clone() {
-        xasm.push(Value::number(l.len() as f64));
-    }
+    xasm.push(
+        Value::number(
+            if let Value::List(l) = (*value).clone() {
+                l.len() as f64
+            } else {
+                0.0
+            }
+        )
+    );
 }
 
 fn print(xasm: &mut Machine) {
