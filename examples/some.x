@@ -23,7 +23,6 @@ class Option {
     fn and_then(self, lambda) {
         if self.is_something {
             self.object = lambda(self.object)
-            println(self.object)
             if not(is_error(self.object)) {}
             else { self.is_something = false }
         } else {}
@@ -46,7 +45,7 @@ fn None() {
 }
 
 
-n = Some(0)
+n = Some(4)
 
 n = n.and_then(fn(a) {
     if not(eq(a, 0)) {

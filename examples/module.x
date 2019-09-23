@@ -14,4 +14,5 @@ fn core["io"]["println"](value) {
     (core["io"]["print"])("\n")
 }
 
+
 core["io"]["println"]("testing")
