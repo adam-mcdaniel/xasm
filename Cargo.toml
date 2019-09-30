@@ -15,8 +15,7 @@ name = "xasm"
 path = "src/bin.rs"
 
 [dependencies]
-# xassembler = "0.2.5"
-xassembler = {path="../xassembler"}
+xassembler = "0.2.5"
 
 clap = "2.33"
 dirs = "2.0"
