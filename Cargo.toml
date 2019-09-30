@@ -15,7 +15,7 @@ name = "xasm"
 path = "src/bin.rs"
 
 [dependencies]
-xassembler = "0.2.5"
+xassembler = "0.3.0"
 
 clap = "2.33"
 dirs = "2.0"
