@@ -89,7 +89,92 @@ fn dict(xasm: &mut Machine) {
 }
 
 fn list(xasm: &mut Machine) {
-    xasm.push(Value::list());
+    let mut result = vec![];
+    let val = xasm.get_arg();
+    let count = i32::from(val.clone());
+    
+    for _ in 0..count {
+        result.push(xasm.pop());
+    }
+
+    xasm.return_value(Value::List(result));
+}
+
+fn range(xasm: &mut Machine) {
+    let mut result = vec![];
+    let lower = i32::from(xasm.get_arg());
+    let upper = i32::from(xasm.get_arg());
+    
+    for i in lower..upper {
+        result.push(Value::number(i));
+    }
+    xasm.return_value(Value::List(result));
+}
+
+fn filter(xasm: &mut Machine) {
+    let mut result = vec![];
+    let list = xasm.get_arg();
+    let function = xasm.pop();
+
+    if let Value::List(mut l) = list {
+        for item in l {
+            xasm.push(item.clone());
+            xasm.push(function.clone());
+            xasm.call();
+            if bool::from(xasm.get_arg()) {
+                result.push(item);
+            }
+        }
+    }
+
+    xasm.return_value(Value::List(result));
+}
+
+fn reverse(xasm: &mut Machine) {
+    let mut list = xasm.get_arg();
+
+    if let Value::List(mut l) = list {
+        l.reverse();
+        list = Value::List(l);
+    }
+
+    xasm.return_value(list);
+}
+
+fn reduce(xasm: &mut Machine) {
+    let list = xasm.get_arg();
+    let function = xasm.pop();
+    let mut accumulator = xasm.pop();
+
+    if let Value::List(mut l) = list {
+        for item in l {
+            xasm.push(accumulator.clone());
+            xasm.push(item.clone());
+            xasm.push(function.clone());
+            xasm.call();
+            accumulator = xasm.pop();
+        }
+    }
+
+    xasm.push(accumulator);
+}
+
+fn map_fn(xasm: &mut Machine) {
+    let mut result = vec![];
+
+    let list = xasm.get_arg();
+    let function = xasm.pop();
+
+    if let Value::List(mut l) = list {
+        for item in l {
+            xasm.push(item.clone());
+            xasm.push(function.clone());
+            xasm.call();
+            result.push(xasm.pop());
+        }
+    }
+
+    xasm.return_value(Value::List(result));
 }
 
 fn push(xasm: &mut Machine) {
@@ -116,11 +201,18 @@ fn len(xasm: &mut Machine) {
         Value::number(
             if let Value::List(l) = (*value).clone() {
                 l.len() as f64
+            } else if let Value::String(s) = (*value).clone() {
+                s.len() as f64
             } else {
                 0.0
             }
         )
     );
+}
+
+fn format(xasm: &mut Machine) {
+    let s = Value::string(format!("{}", xasm.pop()));
+    xasm.push(s);
 }
 
 fn print(xasm: &mut Machine) {
@@ -201,6 +293,26 @@ fn main() {
     xasm.copy();
     xasm.push(Value::string("list"));
     xasm.store();
+    xasm.push(Value::function(range, &xasm));
+    xasm.copy();
+    xasm.push(Value::string("range"));
+    xasm.store();
+    xasm.push(Value::function(filter, &xasm));
+    xasm.copy();
+    xasm.push(Value::string("filter"));
+    xasm.store();
+    xasm.push(Value::function(reduce, &xasm));
+    xasm.copy();
+    xasm.push(Value::string("reduce"));
+    xasm.store();
+    xasm.push(Value::function(map_fn, &xasm));
+    xasm.copy();
+    xasm.push(Value::string("map"));
+    xasm.store();
+    xasm.push(Value::function(reverse, &xasm));
+    xasm.copy();
+    xasm.push(Value::string("reverse"));
+    xasm.store();
     xasm.push(Value::function(len, &xasm));
     xasm.copy();
     xasm.push(Value::string("len"));
@@ -262,6 +374,10 @@ fn main() {
     xasm.push(Value::function(is_error, &xasm));
     xasm.copy();
     xasm.push(Value::string("is_error"));
+    xasm.store();
+    xasm.push(Value::function(format, &xasm));
+    xasm.copy();
+    xasm.push(Value::string("format"));
     xasm.store();
 "#;
 }

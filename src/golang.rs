@@ -57,6 +57,7 @@ impl Compile for Golang {
 
 import (
 	"fmt"
+	"math"
 	. "github.com/adam-mcdaniel/xgopher"
 )
 
@@ -65,7 +66,90 @@ func dict(m *Machine) {
 }
 
 func list(m *Machine) {
-	m.Push(NewEmptyList())
+	result := NewEmptyList().Slice()
+
+	value := m.Pop()
+	count := value.Number()
+
+	for ; count > 0; count-- {
+		result = append(result, m.Pop())
+	}
+
+	m.Push(NewList(result))
+}
+
+func rng(m *Machine) {
+	result := NewEmptyList().Slice()
+
+	lower := m.Pop().Number()
+	upper := m.Pop().Number()
+
+	for count := lower; count < upper; count++ {
+		result = append(result, NewNumber(count))
+	}
+
+	m.Push(NewList(result))
+}
+
+func filter(m *Machine) {
+	result := NewEmptyList().Slice()
+
+	list := m.Pop().Slice()
+	function := m.Pop()
+
+	for _, item := range list {
+		m.Push(item)
+		m.Push(function)
+		m.Call()
+		if m.Pop().Bool() {
+			result = append(result, item)
+		}
+	}
+
+	m.Push(NewList(result))
+}
+
+func reduce(m *Machine) {
+	list := m.Pop().Slice()
+	function := m.Pop()
+	accumulator := m.Pop()
+
+	for _, item := range list {
+		m.Push(accumulator)
+		m.Push(item)
+		m.Push(function)
+		m.Call()
+		accumulator = m.Pop()
+	}
+
+	m.Push(accumulator)
+}
+
+func map_fn(m *Machine) {
+	result := NewEmptyList().Slice()
+
+	list := m.Pop().Slice()
+	function := m.Pop()
+
+	for _, item := range list {
+		m.Push(item)
+		m.Push(function)
+		m.Call()
+		result = append(result, m.Pop())
+	}
+
+	m.Push(NewList(result))
+}
+
+func reverse(m *Machine) {
+	a := m.Pop().Slice()
+
+	for i := len(a)/2-1; i >= 0; i-- {
+		opp := len(a)-1-i
+		a[i], a[opp] = a[opp], a[i]
+	}
+
+	m.Push(NewList(a))
 }
 
 func push(m *Machine) {
@@ -89,8 +173,14 @@ func pop(m *Machine) {
 
 func length(m *Machine) {
 	value := m.Pop()
-	list := value.Slice()
-	m.Push(NewNumber(float64(len(list))))
+	l := value.Slice()
+	s := value.Str()
+	n := math.Max(float64(len(l)), float64(len(s)))
+	m.Push(NewNumber(n))
+}
+
+func format(m *Machine) {
+	m.Push(NewString(fmt.Sprintf("%v", m.Pop())))
 }
 
 func print(m *Machine) {
@@ -161,6 +251,21 @@ func main() {
 	xasm.Push(NewFunction(list, xasm.Duplicate()))
 	xasm.Push(NewString("list"))
 	xasm.Store()
+	xasm.Push(NewFunction(rng, xasm.Duplicate()))
+	xasm.Push(NewString("range"))
+	xasm.Store()
+	xasm.Push(NewFunction(filter, xasm.Duplicate()))
+	xasm.Push(NewString("filter"))
+	xasm.Store()
+	xasm.Push(NewFunction(map_fn, xasm.Duplicate()))
+	xasm.Push(NewString("map"))
+	xasm.Store()
+	xasm.Push(NewFunction(reduce, xasm.Duplicate()))
+	xasm.Push(NewString("reduce"))
+	xasm.Store()
+	xasm.Push(NewFunction(reverse, xasm.Duplicate()))
+	xasm.Push(NewString("reverse"))
+	xasm.Store()
 	xasm.Push(NewFunction(length, xasm.Duplicate()))
 	xasm.Push(NewString("len"))
 	xasm.Store()
@@ -202,6 +307,9 @@ func main() {
 	xasm.Store()
 	xasm.Push(NewFunction(eq, xasm.Duplicate()))
 	xasm.Push(NewString("eq"))
+	xasm.Store()
+	xasm.Push(NewFunction(format, xasm.Duplicate()))
+	xasm.Push(NewString("format"))
 	xasm.Store()
     
 "#;
