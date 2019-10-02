@@ -1,6 +1,6 @@
 [package]
 name = "xasm"
-version = "0.3.2"
+version = "0.4.1"
 authors = ["adam-mcdaniel <adam.mcdanie17@gmail.com>"]
 edition = "2018"
 license = "Apache-2.0"
@@ -15,7 +15,6 @@ name = "xasm"
 path = "src/bin.rs"
 
 [dependencies]
-xassembler = "0.3.0"
-
+xassembler = 0.4.1
 clap = "2.33"
 dirs = "2.0"
