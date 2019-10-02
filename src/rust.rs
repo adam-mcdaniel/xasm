@@ -14,7 +14,7 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-xmachine = "0.1.19"
+xmachine = 0.2.0
 "#;
 
 impl Compile for Rust {
