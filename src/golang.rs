@@ -24,12 +24,13 @@ impl Compile for Golang {
     fn run_subcommand(compiled: &str) -> Result<(), String> {
         Self::build(compiled)?;
 
-        Command::new("go")
+        if let Err(_) = Command::new("go")
             .args(&["run", "main.go"])
             .current_dir(Self::build_dir()?)
             .stdout(Stdio::inherit())
-            .output()
-            .unwrap();
+            .output() {
+			return Err(String::from("Could not run `go`, is golang properly installed?"))
+		}
 
         Ok(())
     }
@@ -41,12 +42,23 @@ impl Compile for Golang {
 
         write(Self::build_dir()? + "/main.go", compiled).expect("Could not write to file main.go");
 
-        Command::new("go")
+		// Install xgopher
+        if let Err(_) = Command::new("go")
+            .args(&["get", "github.com/adam-mcdaniel/xgopher"])
+            .current_dir(Self::build_dir()?)
+            .stdout(Stdio::inherit())
+            .output() {
+			return Err(String::from("Could not run `go`, is golang properly installed?"))
+		}
+
+		// Build main.go
+        if let Err(_) = Command::new("go")
             .args(&["build", "main.go"])
             .current_dir(Self::build_dir()?)
             .stdout(Stdio::inherit())
-            .output()
-            .unwrap();
+            .output() {
+			return Err(String::from("Could not run `go`, is golang properly installed?"))
+		}
 
         Ok(())
     }

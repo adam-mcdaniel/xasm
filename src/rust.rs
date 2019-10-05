@@ -43,12 +43,13 @@ impl Compile for Rust {
     fn run_subcommand(compiled: &str) -> Result<(), String> {
         Self::build(compiled)?;
 
-        Command::new("cargo")
+        if let Err(_) = Command::new("cargo")
             .args(&["run", "--release"])
             .current_dir(Self::build_dir()?)
             .stdout(Stdio::inherit())
-            .output()
-            .unwrap();
+            .output() {
+			return Err(String::from("Could not run `cargo`, is rust properly installed?"))
+		}
 
         Ok(())
     }
@@ -68,11 +69,12 @@ impl Compile for Rust {
         write(Self::build_dir()? + "/Cargo.toml", MANIFEST)
             .expect("Could not write to target/Cargo.toml");
 
-        Command::new("cargo")
+        if let Err(_) = Command::new("cargo")
             .args(&["build", "--release"])
             .current_dir(Self::build_dir()?)
-            .output()
-            .unwrap();
+            .output() {
+			return Err(String::from("Could not run `cargo`, is rust properly installed?"))
+		}
 
         Ok(())
     }
