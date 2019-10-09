@@ -1,4 +1,5 @@
-
+print = @print;
+println = @println;
 
 for i, x in range(1, 10) {
 	print(i);

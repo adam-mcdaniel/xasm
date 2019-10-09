@@ -1,3 +1,6 @@
+new = @new;
+print = @print;
+println = @println;
 
 // Define print function
 fn print(object) {

@@ -1,3 +1,14 @@
+println = @println;
+print = @print;
+push = @push;
+list = @list;
+pop = @pop;
+len = @len;
+add = @add;
+sub = @sub;
+mul = @mul;
+div = @div;
+new = @new;
 
 
 class List {

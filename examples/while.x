@@ -1,4 +1,7 @@
 
+sub = @sub;
+println = @println;
+
 // loop counter
 n = 20
 // while n is not zero

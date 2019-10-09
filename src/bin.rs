@@ -17,6 +17,7 @@ fn main() -> Result<(), String> {
             (about: "Run a xasm file")
             (author: "Adam McDaniel <adam.mcdaniel17@gmail.com>")
             (@arg INPUT: +required "Input file")
+            (@arg PACKAGES: -p --packages +takes_value ... "Paths to foreign packages to use")
         )
         (@subcommand compile =>
             (version: "0.1")
@@ -24,6 +25,7 @@ fn main() -> Result<(), String> {
             (author: "Adam McDaniel <adam.mcdaniel17@gmail.com>")
             (@arg INPUT: +required "Input file")
             (@arg OUTPUT: -o --output +takes_value default_value("a.out") "Output path to executable")
+            (@arg PACKAGES: -p --packages +takes_value ... "Paths to foreign packages to use")
         )
     )
     .setting(ArgRequiredElseHelp)
@@ -42,23 +44,31 @@ fn cli<T: Compile>(matches: ArgMatches) -> Result<(), String> {
     if let Some(matches) = matches.subcommand_matches("run") {
         let input = matches.value_of("INPUT").unwrap();
 
+        let packages = match matches.values_of("PACKAGES") {
+            Some(list) => list.map(|s| s.trim_matches('/')).collect::<Vec<&str>>(),
+            None => vec![]
+        };
+
         if let Ok(contents) = read_to_string(input) {
-            match T::compiler_output(&contents) {
-                Ok(compiled) => T::run_subcommand(&compiled)?,
+            match T::assemble(&contents) {
+                Ok(compiled) => T::run_subcommand(&compiled, packages)?,
                 Err(e) => println!("{}", e),
             }
         } else {
             eprintln!("Could not open file {}", input);
         }
-    }
-
-    if let Some(matches) = matches.subcommand_matches("compile") {
+    } else if let Some(matches) = matches.subcommand_matches("compile") {
         let input = matches.value_of("INPUT").unwrap();
         let output = matches.value_of("OUTPUT").unwrap();
 
+        let packages = match matches.values_of("PACKAGES") {
+            Some(list) => list.map(|s| s.trim_matches('/')).collect::<Vec<&str>>(),
+            None => vec![]
+        };
+        
         if let Ok(contents) = read_to_string(input) {
-            match T::compiler_output(&contents) {
-                Ok(compiled) => T::compile_subcommand(&compiled, &output)?,
+            match T::assemble(&contents) {
+                Ok(compiled) => T::compile_subcommand(&compiled, packages, &output)?,
                 Err(e) => println!("{}", e),
             }
         } else {

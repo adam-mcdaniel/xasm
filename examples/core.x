@@ -1,3 +1,16 @@
+print = @print;
+new = @new;
+eq = @eq;
+not = @not;
+add = @add;
+sub = @sub;
+mul = @mul;
+div = @div;
+rem = @rem;
+len = @len;
+not = @not;
+
+
 true = 1
 false = 0
 

@@ -1,3 +1,16 @@
+println = @println;
+print = @print;
+push = @push;
+list = @list;
+pop = @pop;
+len = @len;
+add = @add;
+sub = @sub;
+mul = @mul;
+div = @div;
+rem = @rem;
+new = @new;
+
 
 // Random number generator class
 class Rand {

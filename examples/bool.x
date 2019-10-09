@@ -1,3 +1,9 @@
+eq = @eq;
+new = @new;
+not = @not;
+println = @println;
+
+
 fn neq(a, b) {
     not(eq(a, b))
 }
@@ -17,11 +23,11 @@ println(neq("test", "test"))
 
 
 class Object {
-    fn new(a) {
+    fn new(self, a) {
         self.value = a
+        self
     }
 }
-
 
 println(
     eq(
