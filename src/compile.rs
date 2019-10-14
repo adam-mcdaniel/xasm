@@ -1,13 +1,14 @@
 use xassembler::{compile, Target};
 
+
 pub trait Compile: Target {
     const BUILD_DIR_NAME: &'static str;
     const PRELUDE: &'static str;
     const TERMINATE: &'static str;
-    fn compile_subcommand(compiled: &str, output_path: &str) -> Result<(), String>;
-    fn run_subcommand(compiled: &str) -> Result<(), String>;
-    fn build(compiled: &str) -> Result<(), String>;
-    fn compiler_output(script: &str) -> Result<String, String>
+    fn compile_subcommand(compiled: &str, dependeny_paths: Vec<&str>, output_path: &str) -> Result<(), String>;
+    fn run_subcommand(compiled: &str, dependeny_paths: Vec<&str>) -> Result<(), String>;
+    fn build(compiled: &str, dependeny_paths: Vec<&str>) -> Result<(), String>;
+    fn assemble(script: &str) -> Result<String, String>
     where
         Self: Sized,
     {

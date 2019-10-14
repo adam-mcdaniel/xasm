@@ -1,3 +1,6 @@
+new = @new;
+println = @println;
+add = @add;
 
 // Represents a point on a plane
 class Point {

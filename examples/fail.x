@@ -1,3 +1,4 @@
+println = @println;
 
 println("testing");
 

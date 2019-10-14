@@ -1,3 +1,6 @@
+mul = @mul;
+println = @println;
+
 
 multiply = fn(n) {
     fn(m) {
