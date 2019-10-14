@@ -5,6 +5,21 @@ use xassembler::Golang;
 
 use crate::compile::Compile;
 
+
+fn gopath() -> Result<String, String> {
+    match option_env!("GOPATH") {
+        Some(path) => Ok(String::from(path)),
+        None => {
+            if cfg!(unix) {
+                Ok(format!("{}/go", Golang::home_dir()?))
+            } else {
+                Ok(String::from("C:\\Go"))
+            }
+        }
+    }
+}
+
+
 impl Compile for Golang {
     fn compile_subcommand(compiled: &str, dependency_paths: Vec<&str>, output_path: &str) -> Result<(), String> {
         Self::build(compiled, dependency_paths)?;
@@ -45,7 +60,7 @@ impl Compile for Golang {
 
 		for dep in &dependency_paths {
 			// Get the path to the `src` folder in the GOPATH
-			let import_path = format!("{}/go/src/", Self::home_dir()?);
+			let import_path = format!("{}/src/", gopath()?);
 
 			// Copy the dependency to the `src` folder in the GOPATH
 			if let Err(_) = copy(dep, &import_path, &copy_opts) {
