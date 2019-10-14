@@ -1,4 +1,5 @@
 use std::fs::{create_dir_all, rename, write};
+use std::path::Path;
 use std::process::{Command, Stdio};
 use fs_extra::dir::{copy, CopyOptions};
 use xassembler::Golang;
@@ -7,15 +8,10 @@ use crate::compile::Compile;
 
 
 fn gopath() -> Result<String, String> {
-    match option_env!("GOPATH") {
-        Some(path) => Ok(String::from(path)),
-        None => {
-            if cfg!(unix) {
-                Ok(format!("{}/go", Golang::home_dir()?))
-            } else {
-                Ok(String::from("C:\\Go"))
-            }
-        }
+    if cfg!(unix) {
+        Ok(format!("{}/go", Golang::home_dir()?))
+    } else {
+        Ok(String::from("C:\\Go"))
     }
 }
 
@@ -72,8 +68,10 @@ impl Compile for Golang {
                                         .iter()
                                         .map(|s|
                                             format!(". \"{}\"",
-												s.clone().rsplit("/").collect::<Vec<&str>>()[0]
-											)).collect::<Vec<String>>()
+												Path::new(s).file_name().unwrap()
+                                                            .to_str().unwrap()
+											))
+                                        .collect::<Vec<String>>()
                                         .join("\n"), compiled);
 
         write(Self::build_dir()? + "/main.go", result).expect("Could not write to file main.go");
