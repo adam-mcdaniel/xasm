@@ -20,7 +20,8 @@ xmachine = "0.2.1"
 
 
 fn make_absolute(s: String) -> String {
-    canonicalize(s).unwrap().display().to_string()
+    // Replace backslashes with doubles to make a valid string
+    canonicalize(s).unwrap().display().to_string().replace("\\", "\\\\")
 }
 
 impl Compile for Rust {
