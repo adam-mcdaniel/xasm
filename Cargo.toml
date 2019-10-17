@@ -1,6 +1,6 @@
 [package]
 name = "xasm"
-version = "0.5.3"
+version = "0.5.6"
 authors = ["adam-mcdaniel <adam.mcdanie17@gmail.com>"]
 edition = "2018"
 license = "Apache-2.0"
@@ -19,3 +19,4 @@ xassembler = "0.5.1"
 clap = "2.33"
 dirs = "2.0"
 fs_extra = "1.1"
+dunce = "1.0"

@@ -1,6 +1,6 @@
 use std::fs::{rename, write};
+use dunce::canonicalize;
 use std::process::{Command, Stdio};
-use std::path::PathBuf;
 use xassembler::Rust;
 
 use crate::compile::Compile;
@@ -18,6 +18,11 @@ edition = "2018"
 xmachine = "0.2.1"
 "#;
 
+
+fn make_absolute(s: String) -> String {
+    // Replace backslashes with doubles to make a valid string
+    canonicalize(s).unwrap().display().to_string().replace("\\", "\\\\")
+}
 
 impl Compile for Rust {
     fn compile_subcommand(compiled: &str, dependency_paths: Vec<&str>, output_path: &str) -> Result<(), String> {
@@ -42,6 +47,7 @@ impl Compile for Rust {
             .args(&["run", "--release"])
             .current_dir(Self::build_dir()?)
             .stdout(Stdio::inherit())
+            .stdin(Stdio::inherit())
             .output() {
 			return Err(String::from("Could not run `cargo`, is rust properly installed?"))
 		}
@@ -76,8 +82,7 @@ impl Compile for Rust {
                                         .map(|s|
                                             format!("{package} = {{path=\"{path}\"}}",
                                                 package=s.clone().rsplit("/").collect::<Vec<&str>>()[0],
-                                                path=PathBuf::from(s).canonicalize().unwrap()
-                                                                .as_os_str().to_str().unwrap())
+                                                path=make_absolute(s.to_string()))
                                             )
                                         .collect::<Vec<String>>()
                                         .join("\n"))) {
