@@ -39,6 +39,7 @@ impl Compile for Golang {
             .args(&["run", "main.go"])
             .current_dir(Self::build_dir()?)
             .stdout(Stdio::inherit())
+            .stdin(Stdio::inherit())
             .output() {
 			return Err(String::from("Could not run `go`, is golang properly installed?"))
 		}

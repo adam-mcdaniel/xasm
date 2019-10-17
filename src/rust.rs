@@ -47,6 +47,7 @@ impl Compile for Rust {
             .args(&["run", "--release"])
             .current_dir(Self::build_dir()?)
             .stdout(Stdio::inherit())
+            .stdin(Stdio::inherit())
             .output() {
 			return Err(String::from("Could not run `cargo`, is rust properly installed?"))
 		}
