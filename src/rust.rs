@@ -58,10 +58,11 @@ impl Compile for Rust {
     fn build(compiled: &str, dependency_paths: Vec<&str>) -> Result<(), String> {
         let result = format!("{}\n{}", dependency_paths
                                         .iter()
-                                        .map(|s|
+                                        .map(|s| {
+                                            let path = make_absolute(s.to_string());
                                             format!("extern crate {lib};\nuse {lib}::*;",
-                                                lib=s.rsplit("/").collect::<Vec<&str>>()[0])
-                                            ).collect::<Vec<String>>()
+                                                lib=std::path::Path::new(&path).file_stem().unwrap().to_str().unwrap()
+                                        }).collect::<Vec<String>>()
                                         .join("\n"), compiled);
 
         if let Err(_) = Command::new("cargo")
