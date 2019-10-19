@@ -81,7 +81,8 @@ impl Compile for Rust {
                                         .iter()
                                         .map(|s|
                                             format!("{package} = {{path=\"{path}\"}}",
-                                                package=s.clone().rsplit("/").collect::<Vec<&str>>()[0],
+                                                package=std::path::Path::new(&s).iter().last()
+                                                            .unwrap().to_str().unwrap(),
                                                 path=make_absolute(s.to_string()))
                                             )
                                         .collect::<Vec<String>>()
