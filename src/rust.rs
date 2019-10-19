@@ -82,8 +82,7 @@ impl Compile for Rust {
                                         .map(|s| {
                                             let path = make_absolute(s.to_string());
                                             format!("{package} = {{path=\"{path}\"}}",
-                                                package=std::path::Path::new(&path).iter().last()
-                                                            .unwrap().to_str().unwrap(),
+                                                package=std::path::Path::new(&path).file_stem().unwrap().to_str().unwrap(),
                                                 path=path)
                                         })
                                         .collect::<Vec<String>>()
