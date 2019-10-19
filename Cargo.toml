@@ -1,6 +1,6 @@
 [package]
 name = "xasm"
-version = "0.5.9"
+version = "0.5.10"
 authors = ["adam-mcdaniel <adam.mcdanie17@gmail.com>"]
 edition = "2018"
 license = "Apache-2.0"
