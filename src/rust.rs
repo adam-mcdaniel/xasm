@@ -62,6 +62,7 @@ impl Compile for Rust {
                                             let path = make_absolute(s.to_string());
                                             format!("extern crate {lib};\nuse {lib}::*;",
                                                 lib=std::path::Path::new(&path).file_stem().unwrap().to_str().unwrap()
+                                            )
                                         }).collect::<Vec<String>>()
                                         .join("\n"), compiled);
 
