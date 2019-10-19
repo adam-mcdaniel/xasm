@@ -79,12 +79,13 @@ impl Compile for Rust {
         if let Err(_) = write(Self::build_dir()? + "/Cargo.toml", format!("{}\n{}", MANIFEST,
                                     dependency_paths
                                         .iter()
-                                        .map(|s|
+                                        .map(|s| {
+                                            let path = make_absolute(s.to_string());
                                             format!("{package} = {{path=\"{path}\"}}",
-                                                package=std::path::Path::new(&s).iter().last()
+                                                package=std::path::Path::new(&path).iter().last()
                                                             .unwrap().to_str().unwrap(),
-                                                path=make_absolute(s.to_string()))
-                                            )
+                                                path=path)
+                                        })
                                         .collect::<Vec<String>>()
                                         .join("\n"))) {
 			return Err(String::from("Could not write to Cargo.toml in output crate"))
