@@ -63,7 +63,7 @@ class Point {
         self
     }
 
-    self.goto(self, x, y) {
+    fn goto(self, x, y) {
         self.x = x
         self.y = y
     }
